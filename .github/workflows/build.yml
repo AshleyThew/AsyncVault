@@ -32,7 +32,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build all modules
-        run: ./gradlew --no-daemon clean build
+        run: ./gradlew --no-daemon -Dorg.gradle.vfs.watch=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8" clean build
 
       - name: Upload build artifacts (tags only)
         if: startsWith(github.ref, 'refs/tags/v')
