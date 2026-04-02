@@ -49,3 +49,16 @@ tasks.jar {
         )
     }
 }
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "com.github.AshleyThew"
+            artifactId = "AsyncVault"
+            version = project.version.toString()
+            artifact(tasks.jar.get()) {
+                classifier = "asyncvault-sponge"
+            }
+        }
+    }
+}

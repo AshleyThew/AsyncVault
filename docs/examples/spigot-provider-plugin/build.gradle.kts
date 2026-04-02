@@ -18,7 +18,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
 
     // Use locally built API jar from this repository.
-    compileOnly(files("../../../asyncvault-api/build/libs/asyncvault-api-1.0.0-alpha.jar"))
+    compileOnly(files("../../../asyncvault-api/build/libs/asyncvault-api-v1.0.0-alpha.jar"))
 
     compileOnly("net.essentialsx:EssentialsX:2.21.2")
     compileOnly("net.luckperms:api:5.4")
