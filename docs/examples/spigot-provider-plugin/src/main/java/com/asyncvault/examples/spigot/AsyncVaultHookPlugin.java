@@ -47,6 +47,10 @@ public final class AsyncVaultHookPlugin extends JavaPlugin {
                 .then(balance -> delayValue(balance, DEMO_DELAY_MS))
                 .thenSync(balance -> {
                     player.sendMessage("[AsyncVault] Economy(" + economy.getName() + ") balance=" + economy.format(balance));
+                    player.sendMessage("[AsyncVault] Economy features: worldScoping=" + economy.supportsWorldScoping()
+                        + ", bankAccounts=" + economy.supportsBankAccounts()
+                        + ", multipleCurrencies=" + economy.supportsMultipleCurrencies());
+                    player.sendMessage("[AsyncVault] Economy currencies=" + String.join(", ", economy.getSupportedCurrencies()));
                     return null;
                 })
                 .exceptionally(error -> {

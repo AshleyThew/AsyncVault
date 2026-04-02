@@ -46,6 +46,26 @@ public abstract class ChatProvider {
     }
 
     /**
+     * Gets the provider instance that handles world-scoped chat operations.
+     *
+     * @return provider to use for world-scoped chat operations
+     */
+    public ChatProvider getWorldScopedProvider() {
+        return this;
+    }
+
+    /**
+     * Gets a provider instance scoped to a specific world.
+     *
+     * @param worldName The world name to scope to
+     * @return world-scoped provider instance
+     * @throws UnsupportedOperationException if world scoping is not supported
+     */
+    public WorldChatProvider getWorldScopedProvider(String worldName) {
+        throw new UnsupportedOperationException("World scoping not supported by " + getName());
+    }
+
+    /**
      * Gets the prefix for a player.
      * Thread-safe; safe to call from main thread.
      *

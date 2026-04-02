@@ -5,8 +5,11 @@ import com.asyncvault.api.execution.ExecutionProvider;
 import com.asyncvault.api.execution.ExecutionProviderContext;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class for economy service implementations.
@@ -52,6 +55,26 @@ public abstract class EconomyProvider {
     }
 
     /**
+     * Gets the provider instance that handles world-scoped operations.
+     *
+     * @return provider to use for world-scoped economy operations
+     */
+    public EconomyProvider getWorldScopedProvider() {
+        return this;
+    }
+
+    /**
+     * Gets a provider instance scoped to a specific world.
+     *
+     * @param worldName The world name to scope to
+     * @return world-scoped provider instance
+     * @throws UnsupportedOperationException if world scoping is not supported
+     */
+    public WorldEconomyProvider getWorldScopedProvider(String worldName) {
+        throw new UnsupportedOperationException("World scoping not supported by " + getName());
+    }
+
+    /**
      * @return true if this provider supports bank accounts
      */
     public boolean supportsBankAccounts() {
@@ -59,10 +82,71 @@ public abstract class EconomyProvider {
     }
 
     /**
+     * Gets the provider instance that handles bank account operations.
+     *
+     * @return provider to use for bank account economy operations
+     */
+    public EconomyProvider getBankAccountProvider() {
+        return this;
+    }
+
+    /**
+     * Gets a provider instance scoped to a specific bank account id.
+     *
+     * @param bankAccountId The bank account id to scope to
+     * @return bank account-scoped provider instance
+     * @throws UnsupportedOperationException if bank accounts are not supported
+     */
+    public BankAccountEconomyProvider getBankAccountProvider(String bankAccountId) {
+        throw new UnsupportedOperationException("Bank accounts not supported by " + getName());
+    }
+
+    /**
+     * @return true if this provider supports multiple currencies
+     */
+    public boolean supportsMultipleCurrencies() {
+        return false;
+    }
+
+    /**
+     * Lists currencies supported by this provider.
+     *
+     * @return supported currency identifiers
+     */
+    public List<String> getSupportedCurrencies() {
+        return Collections.singletonList(getCurrency());
+    }
+
+    /**
+     * Gets the provider for a specific currency.
+     *
+     * @param currencyId The currency identifier
+     * @return provider to use for that currency
+     * @throws UnsupportedOperationException if the requested currency is unsupported
+     */
+    public EconomyProvider getCurrencyProvider(String currencyId) {
+        if (Objects.equals(getCurrency(), currencyId)) {
+            return this;
+        }
+        throw new UnsupportedOperationException("Currency '" + currencyId + "' not supported by " + getName());
+    }
+
+    /**
+     * Gets providers for all supported currencies.
+     *
+     * @return providers for all supported currencies
+     */
+    public List<EconomyProvider> getCurrencyProviders() {
+        return getSupportedCurrencies().stream()
+            .map(this::getCurrencyProvider)
+            .collect(Collectors.toList());
+    }
+
+    /**
      * Gets balance asynchronously.
      *
      * <p>The result is completed on an async thread. If you need to interact with
-     * Bukkit API, use {@link #thenAcceptOnMainThread(AsyncResult, java.util.function.Consumer)}
+     * Bukkit API, use {@link com.asyncvault.api.AsyncResult#thenAcceptSync(java.util.function.Consumer)}
      * to safely schedule callback on main thread.
      *
      * @param uuid The player UUID

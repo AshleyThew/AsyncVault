@@ -7,6 +7,7 @@ This is a full plugin-style example that exposes an AsyncVault economy provider 
 - A Spigot plugin bootstrap
 - Direct EssentialsX plugin and economy API usage
 - An AsyncVault economy provider with `BigDecimal` values
+- Economy capability flags (world, bank, multi-currency)
 - Provider registration on startup
 - A consumer example showing how another plugin can use the provider
 
@@ -74,6 +75,21 @@ public final class EssentialsEconomyProvider extends EconomyProvider {
     @Override
     public boolean supportsAsyncOperations() {
         return true;
+    }
+
+    @Override
+    public boolean supportsWorldScoping() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBankAccounts() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsMultipleCurrencies() {
+        return false;
     }
 
     @Override
@@ -160,8 +176,30 @@ public final class BalanceCommandPlugin extends JavaPlugin {
 }
 ```
 
+## Scoped And Multi-Currency Support
+
+Use capability flags before resolving scoped providers:
+
+```java
+if (economy.supportsWorldScoping()) {
+    EconomyProvider netherEconomy = economy.getWorldScopedProvider("world_nether");
+}
+
+if (economy.supportsBankAccounts()) {
+    EconomyProvider guildBank = economy.getBankAccountProvider("guild:alpha");
+}
+
+if (economy.supportsMultipleCurrencies()) {
+    for (String currencyId : economy.getSupportedCurrencies()) {
+        EconomyProvider currencyProvider = economy.getCurrencyProvider(currencyId);
+        // Use the currency-specific provider for balance/withdraw/deposit calls.
+    }
+}
+```
+
 ## Notes
 
 - This example uses the real EssentialsX API directly, not Vault.
 - Keep money amounts as `BigDecimal` end to end.
 - Register the provider only after Essentials is enabled.
+- EssentialsX in this example is single-currency and not world/bank scoped.

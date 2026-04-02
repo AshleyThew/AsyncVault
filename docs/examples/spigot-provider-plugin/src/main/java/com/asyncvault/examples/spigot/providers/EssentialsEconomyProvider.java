@@ -30,6 +30,21 @@ public final class EssentialsEconomyProvider extends EconomyProvider {
     }
 
     @Override
+    public boolean supportsWorldScoping() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBankAccounts() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsMultipleCurrencies() {
+        return false;
+    }
+
+    @Override
     public AsyncResult<BigDecimal> getBalanceAsync(UUID uuid) {
         return getExecutionProvider().supplySync(() -> {
             try {
