@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "asyncvault",
+  "version": "${version}",
+  "name": "AsyncVault",
+  "description": "Modern async-first service API for Fabric (v${version})",
+  "authors": ["Dablakbandit (AshleyThew)"],
+  "contact": {
+    "homepage": "https://github.com/AshleyThew/AsyncVault",
+    "sources": "https://github.com/AshleyThew/AsyncVault"
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["com.asyncvault.fabric.AsyncVaultFabric"]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.14.0",
+    "minecraft": "1.20.1"
+  }
+}

@@ -1,0 +1,17 @@
+name: AsyncVaultHookExample
+main: com.asyncvault.examples.spigot.AsyncVaultHookPlugin
+version: 1.0.0
+api-version: '1.21'
+softdepend:
+  - AsyncVault
+  - Essentials
+  - LuckPerms
+  - PlaceholderAPI
+commands:
+  avhooks:
+    description: Show AsyncVault hook status.
+    usage: /avhooks
+    permission: avhooks.status
+permissions:
+  avhooks.status:
+    default: true

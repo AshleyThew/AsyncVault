@@ -1,0 +1,17 @@
+name: AsyncVault
+main: com.asyncvault.spigot.AsyncVaultPlugin
+version: ${version}
+description: Modern Async-First Minecraft Plugin API (v${version})
+authors:
+  - Dablakbandit (AshleyThew)
+website: https://github.com/AshleyThew/AsyncVault
+folia-supported: true
+
+# Permissions provided by this plugin
+permissions:
+  asyncvault.admin:
+    description: Access to AsyncVault admin commands
+    default: op
+  asyncvault.balance:
+    description: Check player balance
+    default: true

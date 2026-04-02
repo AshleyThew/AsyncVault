@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ['v*']
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (JDK 21)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle cache
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build all modules
+        run: ./gradlew --no-daemon clean build
+
+      - name: Upload build artifacts (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@v4
+        with:
+          name: asyncvault-${{ github.ref_name }}
+          path: |
+            build/libs/*.jar
+            asyncvault-api/build/libs/*.jar
+
+      - name: JitPack info (tags only)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "JitPack builds automatically from tags."
+          echo "URL: https://jitpack.io/com/github/AshleyThew/AsyncVault/${{ github.ref_name }}"
