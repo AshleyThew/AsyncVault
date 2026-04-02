@@ -38,7 +38,17 @@ tasks.processResources {
 }
 
 tasks.jar {
-    archiveClassifier.set("dev")
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+    archiveBaseName.set("asyncvault-fabric")
+    archiveVersion.set(project.version.toString())
+    archiveClassifier.set("")
+
+    from({
+        configurations.runtimeClasspath.get()
+            .filter { it.name.contains("asyncvault-api") }
+            .map { zipTree(it) }
+    })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     manifest {
         attributes(
@@ -47,11 +57,4 @@ tasks.jar {
             "Implementation-Vendor" to "AsyncVault"
         )
     }
-}
-
-tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
-    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
-    archiveBaseName.set("asyncvault-fabric")
-    archiveVersion.set(project.version.toString())
-    archiveClassifier.set("")
 }
