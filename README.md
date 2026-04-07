@@ -1,5 +1,8 @@
 # AsyncVault
 
+[![Latest Release](https://img.shields.io/github/v/release/AshleyThew/AsyncVault?display_name=tag)](https://github.com/AshleyThew/AsyncVault/releases/latest)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/AshleyThew/AsyncVault/build.yml?branch=main&label=build)](https://github.com/AshleyThew/AsyncVault/actions/workflows/build.yml)
+
 AsyncVault is a lightweight bridge API for Economy, Permission, and Chat services.
 
 It does not provide economy or permission data by itself. Instead, provider plugins implement AsyncVault contracts and expose real backends (database, Redis, existing plugin data, etc.).
@@ -42,7 +45,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.github.AshleyThew:AsyncVault:v1.0.0-alpha:asyncvault-api")
+    compileOnly("com.github.AshleyThew:AsyncVault:{version}:asyncvault-api")
 }
 ```
 
