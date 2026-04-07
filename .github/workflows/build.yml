@@ -32,6 +32,8 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build all modules
+        env:
+          TAG: ${{ github.ref_name }}
         run: ./gradlew --no-daemon -Dorg.gradle.vfs.watch=false -Dorg.gradle.jvmargs="-Xmx3g -XX:MaxMetaspaceSize=768m -Dfile.encoding=UTF-8" clean build
 
       - name: Publish GitHub release assets (tags only)

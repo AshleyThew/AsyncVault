@@ -1,0 +1,6 @@
+name: AsyncVault
+main: com.asyncvault.bungeecord.AsyncVaultBungeePlugin
+version: ${version}
+description: Modern Async-First Minecraft Proxy API (v${version})
+author: Dablakbandit (AshleyThew)
+website: https://github.com/AshleyThew/AsyncVault

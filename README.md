@@ -13,6 +13,16 @@ It does not provide economy or permission data by itself. Instead, provider plug
 
 After startup, other plugins can discover and use AsyncVault services through the registered providers.
 
+## Supported Platforms
+
+| Platform               | Module                  | Notes                                                               |
+| ---------------------- | ----------------------- | ------------------------------------------------------------------- |
+| Spigot / Paper / Folia | `asyncvault-spigot`     | Includes Folia regional scheduler and Paper async scheduler support |
+| Fabric                 | `asyncvault-fabric`     | Fabric Loader 0.14+                                                 |
+| Sponge                 | `asyncvault-sponge`     | SpongeAPI 10                                                        |
+| Velocity               | `asyncvault-velocity`   | Velocity 3.x proxy                                                  |
+| BungeeCord / Waterfall | `asyncvault-bungeecord` | BungeeCord + Waterfall-compatible proxy                             |
+
 ## What AsyncVault Provides
 
 - Stable API contracts for Economy, Permission, and Chat.

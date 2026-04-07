@@ -1,0 +1,10 @@
+{
+  "id": "asyncvault",
+  "name": "AsyncVault",
+  "version": "${version}",
+  "description": "Modern async-first service API for Velocity",
+  "authors": ["Dablakbandit (AshleyThew)"],
+  "url": "https://github.com/AshleyThew/AsyncVault",
+  "main": "com.asyncvault.velocity.AsyncVaultVelocity",
+  "dependencies": []
+}

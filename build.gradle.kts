@@ -3,6 +3,6 @@ plugins {
 }
 
 allprojects {
-	version = "v1.0.0-alpha"
+	version = System.getenv("TAG") ?: "v1.0.2-alpha"
 	group = "com.github.AshleyThew"
 }

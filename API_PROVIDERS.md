@@ -29,12 +29,62 @@ Result chaining rule:
 
 If you have a custom bootstrap or tests, explicit `ExecutionProvider` injection is still valid.
 
+## Platform Registration Quick Reference
+
+### Fabric Registration Example
+
+Fabric has no unified services manager. Use `AsyncVaultServiceRegistry`.
+
+```java
+import com.asyncvault.api.service.AsyncVaultServiceRegistry;
+
+AsyncVaultServiceRegistry registry = AsyncVaultServiceRegistry.getInstance();
+
+registry.register(EconomyProvider.class, new SqlEconomyProvider(config));
+registry.register(PermissionProvider.class, new SqlPermissionProvider(config));
+registry.register(ChatProvider.class, new SqlChatProvider(config));
+```
+
+### Velocity Registration Example
+
+Velocity has no built-in cross-plugin services manager. Use `AsyncVaultServiceRegistry`.
+
+```java
+import com.asyncvault.api.service.AsyncVaultServiceRegistry;
+
+AsyncVaultServiceRegistry registry = AsyncVaultServiceRegistry.getInstance();
+
+registry.register(EconomyProvider.class, new SqlEconomyProvider(config));
+registry.register(PermissionProvider.class, new SqlPermissionProvider(config));
+registry.register(ChatProvider.class, new SqlChatProvider(config));
+```
+
+### BungeeCord / Waterfall Registration Example
+
+BungeeCord has no built-in cross-plugin services manager. Use `AsyncVaultServiceRegistry`.
+
+```java
+import com.asyncvault.api.service.AsyncVaultServiceRegistry;
+
+AsyncVaultServiceRegistry registry = AsyncVaultServiceRegistry.getInstance();
+
+registry.register(EconomyProvider.class, new SqlEconomyProvider(config));
+registry.register(PermissionProvider.class, new SqlPermissionProvider(config));
+registry.register(ChatProvider.class, new SqlChatProvider(config));
+
+// On onDisable, unregister your own services.
+registry.unregister(EconomyProvider.class);
+registry.unregister(PermissionProvider.class);
+registry.unregister(ChatProvider.class);
+```
+
 ## Example: Economy Provider (SQL-backed)
 
 ```java
 import com.asyncvault.api.AsyncResult;
 import com.asyncvault.api.economy.EconomyProvider;
 import com.asyncvault.api.economy.EconomyResponse;
+
 import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -412,5 +462,81 @@ public final class MyProviderRegistry {
     public static ChatProvider chat() {
         return chat;
     }
+}
+```
+
+### Velocity (plugin-owned registry)
+
+Velocity has no built-in cross-plugin services manager. Expose provider instances from your plugin's
+own static registry. Other plugins resolve providers by depending on your plugin at runtime.
+
+```java
+import com.asyncvault.api.chat.ChatProvider;
+import com.asyncvault.api.economy.EconomyProvider;
+import com.asyncvault.api.permission.PermissionProvider;
+import com.google.inject.Inject;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.proxy.ProxyServer;
+
+@Plugin(id = "my-provider-plugin", name = "MyProviderPlugin", version = "1.0.0")
+public final class MyProviderPlugin {
+
+    private static EconomyProvider economy;
+    private static PermissionProvider permission;
+    private static ChatProvider chat;
+
+    @Inject
+    public MyProviderPlugin(ProxyServer server) {
+    }
+
+    @Subscribe
+    public void onProxyInitialize(ProxyInitializeEvent event) {
+        economy = new SqlEconomyProvider(createDataSource());
+        permission = new SqlPermissionProvider(createDataSource());
+        chat = new SqlChatProvider(createDataSource());
+    }
+
+    public static EconomyProvider economy() { return economy; }
+    public static PermissionProvider permission() { return permission; }
+    public static ChatProvider chat() { return chat; }
+}
+```
+
+### BungeeCord / Waterfall (plugin-owned registry)
+
+BungeeCord has no built-in cross-plugin services manager. Expose provider instances from your plugin's
+own static registry. The same approach works for Waterfall, which is API-compatible with BungeeCord.
+
+```java
+import com.asyncvault.api.chat.ChatProvider;
+import com.asyncvault.api.economy.EconomyProvider;
+import com.asyncvault.api.permission.PermissionProvider;
+import net.md_5.bungee.api.plugin.Plugin;
+
+public final class MyProviderPlugin extends Plugin {
+
+    private static EconomyProvider economy;
+    private static PermissionProvider permission;
+    private static ChatProvider chat;
+
+    @Override
+    public void onEnable() {
+        economy = new SqlEconomyProvider(createDataSource());
+        permission = new SqlPermissionProvider(createDataSource());
+        chat = new SqlChatProvider(createDataSource());
+    }
+
+    @Override
+    public void onDisable() {
+        economy = null;
+        permission = null;
+        chat = null;
+    }
+
+    public static EconomyProvider economy() { return economy; }
+    public static PermissionProvider permission() { return permission; }
+    public static ChatProvider chat() { return chat; }
 }
 ```

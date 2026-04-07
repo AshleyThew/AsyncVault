@@ -60,12 +60,47 @@ ChatProvider chat = Sponge.server().serviceProvider().provide(ChatProvider.class
 
 ### Fabric Lookup Example
 
-Fabric has no unified services manager. Read provider instances from the provider mod API/registry.
+Fabric has no unified services manager. Use `AsyncVaultServiceRegistry` — a generic
+thread-safe registry shipped in the API jar that any mod can use, not limited to AsyncVault services.
 
 ```java
-EconomyProvider economy = MyProviderRegistry.economy();
-PermissionProvider permission = MyProviderRegistry.permission();
-ChatProvider chat = MyProviderRegistry.chat();
+import com.asyncvault.api.service.AsyncVaultServiceRegistry;
+
+AsyncVaultServiceRegistry registry = AsyncVaultServiceRegistry.getInstance();
+
+EconomyProvider economy   = registry.getProvider(EconomyProvider.class).orElse(null);
+PermissionProvider permission = registry.getProvider(PermissionProvider.class).orElse(null);
+ChatProvider chat         = registry.getProvider(ChatProvider.class).orElse(null);
+```
+
+### Velocity Lookup Example
+
+Velocity has no built-in cross-plugin services manager. Use `AsyncVaultServiceRegistry` —
+the same generic registry available on Fabric and BungeeCord/Waterfall.
+
+```java
+import com.asyncvault.api.service.AsyncVaultServiceRegistry;
+
+AsyncVaultServiceRegistry registry = AsyncVaultServiceRegistry.getInstance();
+
+EconomyProvider economy       = registry.getProvider(EconomyProvider.class).orElse(null);
+PermissionProvider permission = registry.getProvider(PermissionProvider.class).orElse(null);
+ChatProvider chat             = registry.getProvider(ChatProvider.class).orElse(null);
+```
+
+### BungeeCord / Waterfall Lookup Example
+
+BungeeCord has no built-in cross-plugin services manager. Use `AsyncVaultServiceRegistry` —
+the same generic registry available on Fabric, usable by any plugin.
+
+```java
+import com.asyncvault.api.service.AsyncVaultServiceRegistry;
+
+AsyncVaultServiceRegistry registry = AsyncVaultServiceRegistry.getInstance();
+
+EconomyProvider economy       = registry.getProvider(EconomyProvider.class).orElse(null);
+PermissionProvider permission = registry.getProvider(PermissionProvider.class).orElse(null);
+ChatProvider chat             = registry.getProvider(ChatProvider.class).orElse(null);
 ```
 
 ## 3. Result Chaining Model

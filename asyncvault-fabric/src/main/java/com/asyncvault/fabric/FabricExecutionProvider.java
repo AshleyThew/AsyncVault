@@ -4,15 +4,16 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.MinecraftServer;
 import com.asyncvault.api.execution.ExecutionProvider;
 
+import net.minecraft.Util;
+
 import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
 
 /**
  * Execution provider for Fabric.
  */
 public final class FabricExecutionProvider implements ExecutionProvider {
 
-    private final Executor asyncExecutor = ForkJoinPool.commonPool();
+    private final Executor asyncExecutor = Util.backgroundExecutor();
     private volatile MinecraftServer server;
 
     public FabricExecutionProvider() {

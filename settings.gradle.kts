@@ -4,7 +4,9 @@ include(
     "asyncvault-api",
     "asyncvault-spigot",
     "asyncvault-fabric",
-    "asyncvault-sponge"
+    "asyncvault-sponge",
+    "asyncvault-velocity",
+    "asyncvault-bungeecord"
 )
 
 pluginManagement {
@@ -21,7 +23,7 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/")
-        maven("https://oss.sonatype.org/content/repositories/snapshots/")
+        maven("https://hub.spigotmc.org/nexus/content/groups/public/")
         maven("https://repo.maven.apache.org/maven2/")
         maven("https://maven.fabricmc.net/")
         maven("https://jitpack.io")
