@@ -113,6 +113,25 @@ public abstract class AsyncResult<T> extends CompletableFuture<T> {
         return SyncResult.fromStage(executionProvider, super.whenCompleteAsync(action, executionProvider.syncExecutor()));
     }
 
+    public AsyncResult<T> exceptionallyAsync(Function<Throwable, ? extends T> fn) {
+        return fromStage(
+            executionProvider,
+            super.handleAsync((value, error) -> error == null ? value : fn.apply(unwrapThrowable(error)), executionProvider.asyncExecutor())
+        );
+    }
+
+    public SyncResult<T> exceptionallySync(Function<Throwable, ? extends T> fn) {
+        return SyncResult.fromStage(
+            executionProvider,
+            super.handleAsync((value, error) -> error == null ? value : fn.apply(unwrapThrowable(error)), executionProvider.syncExecutor())
+        );
+    }
+
+    /**
+     * @deprecated Use {@link #exceptionallyAsync(Function)} or {@link #exceptionallySync(Function)}
+     * to pin execution to an explicit executor.
+     */
+    @Deprecated
     @Override
     public AsyncResult<T> exceptionally(Function<Throwable, ? extends T> fn) {
         return fromStage(executionProvider, super.exceptionally(fn));
@@ -304,7 +323,7 @@ public abstract class AsyncResult<T> extends CompletableFuture<T> {
         AsyncResult<T> result = create();
         CompletableFuture.supplyAsync(supplier, executor).whenComplete((value, error) -> {
             if (error != null) {
-                result.completeExceptionally(error);
+                result.completeExceptionally(unwrapThrowable(error));
             } else {
                 result.complete(value);
             }
@@ -325,15 +344,41 @@ public abstract class AsyncResult<T> extends CompletableFuture<T> {
     }
 
     static <U> AsyncResult<U> fromStage(ExecutionProvider executionProvider, CompletionStage<U> stage) {
-        AsyncResult<U> result = create(executionProvider);
+        CompletableFuture<U> upstream = null;
+        try {
+            upstream = stage.toCompletableFuture();
+        } catch (Throwable ignored) {
+            // Some CompletionStage implementations may not expose a completable future.
+        }
+
+        final CompletableFuture<U> finalUpstream = upstream;
+        AsyncResult<U> result = new SimpleAsyncResult<U>(executionProvider) {
+            @Override
+            public boolean cancel(boolean mayInterruptIfRunning) {
+                boolean cancelled = super.cancel(mayInterruptIfRunning);
+                if (cancelled && finalUpstream != null) {
+                    finalUpstream.cancel(mayInterruptIfRunning);
+                }
+                return cancelled;
+            }
+        };
         stage.whenComplete((value, error) -> {
             if (error != null) {
-                result.completeExceptionally(error);
+                result.completeExceptionally(unwrapThrowable(error));
             } else {
                 result.complete(value);
             }
         });
         return result;
+    }
+
+    private static Throwable unwrapThrowable(Throwable error) {
+        Throwable current = error;
+        while ((current instanceof CompletionException || current instanceof ExecutionException)
+            && current.getCause() != null) {
+            current = current.getCause();
+        }
+        return current;
     }
 
     public static <U> AsyncResult<U> fromStage(CompletionStage<U> stage) {

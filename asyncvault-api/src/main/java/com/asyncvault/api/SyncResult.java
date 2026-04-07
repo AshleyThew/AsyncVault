@@ -121,6 +121,25 @@ public abstract class SyncResult<T> extends CompletableFuture<T> {
         return AsyncResult.fromStage(executionProvider, super.whenCompleteAsync(action, executionProvider.asyncExecutor()));
     }
 
+    public SyncResult<T> exceptionallySync(Function<Throwable, ? extends T> fn) {
+        return fromStage(
+            executionProvider,
+            super.handleAsync((value, error) -> error == null ? value : fn.apply(unwrapThrowable(error)), executionProvider.syncExecutor())
+        );
+    }
+
+    public AsyncResult<T> exceptionallyAsync(Function<Throwable, ? extends T> fn) {
+        return AsyncResult.fromStage(
+            executionProvider,
+            super.handleAsync((value, error) -> error == null ? value : fn.apply(unwrapThrowable(error)), executionProvider.asyncExecutor())
+        );
+    }
+
+    /**
+     * @deprecated Use {@link #exceptionallySync(Function)} or {@link #exceptionallyAsync(Function)}
+     * to pin execution to an explicit executor.
+     */
+    @Deprecated
     @Override
     public SyncResult<T> exceptionally(Function<Throwable, ? extends T> fn) {
         return fromStage(executionProvider, super.exceptionally(fn));
@@ -215,15 +234,41 @@ public abstract class SyncResult<T> extends CompletableFuture<T> {
     }
 
     static <U> SyncResult<U> fromStage(ExecutionProvider executionProvider, CompletionStage<U> stage) {
-        SyncResult<U> result = create(executionProvider);
+        CompletableFuture<U> upstream = null;
+        try {
+            upstream = stage.toCompletableFuture();
+        } catch (Throwable ignored) {
+            // Some CompletionStage implementations may not expose a completable future.
+        }
+
+        final CompletableFuture<U> finalUpstream = upstream;
+        SyncResult<U> result = new SimpleSyncResult<U>(executionProvider) {
+            @Override
+            public boolean cancel(boolean mayInterruptIfRunning) {
+                boolean cancelled = super.cancel(mayInterruptIfRunning);
+                if (cancelled && finalUpstream != null) {
+                    finalUpstream.cancel(mayInterruptIfRunning);
+                }
+                return cancelled;
+            }
+        };
         stage.whenComplete((value, error) -> {
             if (error != null) {
-                result.completeExceptionally(error);
+                result.completeExceptionally(unwrapThrowable(error));
             } else {
                 result.complete(value);
             }
         });
         return result;
+    }
+
+    private static Throwable unwrapThrowable(Throwable error) {
+        Throwable current = error;
+        while ((current instanceof CompletionException || current instanceof ExecutionException)
+            && current.getCause() != null) {
+            current = current.getCause();
+        }
+        return current;
     }
 
     public static <U> SyncResult<U> fromStage(CompletionStage<U> stage) {

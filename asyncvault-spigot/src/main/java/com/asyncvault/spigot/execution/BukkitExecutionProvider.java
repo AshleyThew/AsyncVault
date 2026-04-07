@@ -15,7 +15,13 @@ public final class BukkitExecutionProvider implements ExecutionProvider {
 
     @Override
     public Executor syncExecutor() {
-        return task -> plugin.getServer().getScheduler().runTask(plugin, task);
+        return task -> {
+            if (Bukkit.isPrimaryThread()) {
+                task.run();
+                return;
+            }
+            Bukkit.getScheduler().runTask(plugin, task);
+        };
     }
 
     @Override

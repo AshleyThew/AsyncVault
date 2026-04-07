@@ -140,7 +140,7 @@ public final class EconomyFeature {
                 sendMessage(playerId, "Balance: " + economy.format(balance));
                 return null;
             })
-            .exceptionally(error -> {
+            .exceptionallySync(error -> {
                 logError("Failed to load balance", error);
                 return null;
             });
@@ -156,7 +156,7 @@ public final class EconomyFeature {
                 }
                 return null;
             })
-            .exceptionally(error -> {
+            .exceptionallySync(error -> {
                 logError("Payment exception", error);
                 return null;
             });
@@ -215,9 +215,13 @@ chat.getPlayerPrefixAsync(playerId)
 
 Use one of these patterns consistently:
 
-- `exceptionally(...)` / `exceptionallySync(...)` for fallback values
+- `exceptionallyAsync(...)` / `exceptionallySync(...)` for fallback values with explicit executor pinning
 - `handle(...)` / `handleSync(...)` for success + failure in one chain
 - `whenComplete(...)` / `whenCompleteSync(...)` for side-effects and logging
+
+Legacy note:
+
+- `exceptionally(...)` is still available for backward compatibility, but it is not executor-pinned and is deprecated in favor of explicit `exceptionallyAsync(...)` / `exceptionallySync(...)`.
 
 Example:
 
