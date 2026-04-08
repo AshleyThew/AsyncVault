@@ -21,6 +21,7 @@ dependencies {
 3. Never block the server thread with database I/O.
 4. Use `getExecutionProvider().supplySync(...)` for work that must run on the sync executor, then convert with `.asAsync()` if the provider method returns `AsyncResult`.
 5. Use `getExecutionProvider().supply(...)` or `supplyAsync(...)` for async work.
+6. If an economy operation partially applies, return `EconomyResponse.ResponseStatus.PARTIAL` and include restore metadata so callers can invoke `restoreAsync(...)`.
 
 Result chaining rule:
 
@@ -190,6 +191,22 @@ public final class SqlEconomyProvider extends EconomyProvider {
     }
 
     @Override
+    public AsyncResult<EconomyResponse> restoreAsync(UUID uuid, EconomyResponse partialResponse) {
+        return getExecutionProvider().supplyAsync(() -> {
+            if (partialResponse == null || !partialResponse.requiresRestore()) {
+                return EconomyResponse.failure("Nothing to restore");
+            }
+
+            BigDecimal amount = partialResponse.getRestoreAmount();
+            return switch (partialResponse.getRestoreAction()) {
+                case DEPOSIT -> applyDeposit(uuid, amount);
+                case WITHDRAW -> applyWithdraw(uuid, amount);
+                default -> EconomyResponse.failure("Unsupported restore action");
+            };
+        });
+    }
+
+    @Override
     public AsyncResult<Boolean> hasAccountAsync(UUID uuid) {
         return getExecutionProvider().supplyAsync(() -> {
             try (Connection con = dataSource.getConnection();
@@ -205,6 +222,8 @@ public final class SqlEconomyProvider extends EconomyProvider {
     }
 }
 ```
+
+`restoreAsync(...)` is required for every economy provider implementation and is used to compensate partial transaction attempts.
 
 ## Example: Permission Provider (DB-backed)
 

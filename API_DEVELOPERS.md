@@ -151,6 +151,16 @@ public final class EconomyFeature {
             .thenSync(response -> {
                 if (response.isSuccessful()) {
                     sendMessage(playerId, "Paid " + economy.format(amount));
+                } else if (response.isPartial()) {
+                    economy.restoreAsync(playerId, response)
+                        .thenSync(restore -> {
+                            if (restore.isSuccessful()) {
+                                sendMessage(playerId, "Payment rolled back after partial failure.");
+                            } else {
+                                sendMessage(playerId, "Payment partially failed and restore failed: " + restore.getErrorMessage());
+                            }
+                            return null;
+                        });
                 } else {
                     sendMessage(playerId, "Payment failed: " + response.getErrorMessage());
                 }
@@ -171,6 +181,8 @@ public final class EconomyFeature {
     }
 }
 ```
+
+When `isPartial()` is true, always invoke `restoreAsync(...)` with the returned response so the provider can compensate the attempted transaction.
 
 ## 5. Permission Usage
 

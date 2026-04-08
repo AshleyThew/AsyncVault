@@ -209,6 +209,18 @@ public abstract class EconomyProvider {
     public abstract AsyncResult<EconomyResponse> withdrawAsync(UUID uuid, BigDecimal amount);
 
     /**
+     * Restores a previously attempted partial transaction.
+     *
+     * <p>When an operation returns {@link EconomyResponse.ResponseStatus#PARTIAL}, callers
+     * should pass that response back to this method to perform provider-specific compensation.
+     *
+     * @param uuid The player UUID
+     * @param partialResponse A partial response that requires restoration
+     * @return An async result with the restore outcome
+     */
+    public abstract AsyncResult<EconomyResponse> restoreAsync(UUID uuid, EconomyResponse partialResponse);
+
+    /**
      * Withdraws money asynchronously (legacy String-based, pre-UUID servers).
      *
      * @param playerName The player name
@@ -218,6 +230,19 @@ public abstract class EconomyProvider {
      */
     @Deprecated
     public AsyncResult<EconomyResponse> withdrawAsync(String playerName, BigDecimal amount) {
+        throw new UnsupportedOperationException("String-based player identification not supported");
+    }
+
+    /**
+     * Restores a previously attempted partial transaction (legacy String-based, pre-UUID servers).
+     *
+     * @param playerName The player name
+     * @param partialResponse A partial response that requires restoration
+     * @return An async result with the restore outcome
+     * @deprecated Use UUID-based method instead
+     */
+    @Deprecated
+    public AsyncResult<EconomyResponse> restoreAsync(String playerName, EconomyResponse partialResponse) {
         throw new UnsupportedOperationException("String-based player identification not supported");
     }
 

@@ -90,6 +90,32 @@ public final class EssentialsEconomyProvider extends EconomyProvider {
     }
 
     @Override
+    public AsyncResult<EconomyResponse> restoreAsync(UUID uuid, EconomyResponse partialResponse) {
+        return getExecutionProvider().supplySync(() -> {
+            if (partialResponse == null || !partialResponse.requiresRestore()) {
+                return EconomyResponse.failure("Nothing to restore");
+            }
+
+            try {
+                BigDecimal restoreAmount = partialResponse.getRestoreAmount();
+                switch (partialResponse.getRestoreAction()) {
+                    case DEPOSIT:
+                        Economy.add(uuid, restoreAmount);
+                        return EconomyResponse.success(restoreAmount);
+                    case WITHDRAW:
+                        Economy.subtract(uuid, restoreAmount);
+                        return EconomyResponse.success(restoreAmount);
+                    case NONE:
+                    default:
+                        return EconomyResponse.failure("Unsupported restore action: " + partialResponse.getRestoreAction());
+                }
+            } catch (Exception ex) {
+                return EconomyResponse.failure("Restore failed: " + ex.getMessage());
+            }
+        }).asAsync();
+    }
+
+    @Override
     public AsyncResult<Boolean> hasAccountAsync(UUID uuid) {
         return getExecutionProvider().supplySync(() -> essentials.getUser(uuid) != null).asAsync();
     }
