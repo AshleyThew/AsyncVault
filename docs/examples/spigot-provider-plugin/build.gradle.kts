@@ -19,7 +19,7 @@ dependencies {
 
     // Use locally built API jar from this repository.
     
-    compileOnly("com.github.AshleyThew:AsyncVault:v1.0.3-alpha:asyncvault-api")
+    compileOnly("com.github.AshleyThew:AsyncVault:v1.0.4-alpha:asyncvault-api")
 
     compileOnly("net.essentialsx:EssentialsX:2.21.2")
     compileOnly("net.luckperms:api:5.4")
