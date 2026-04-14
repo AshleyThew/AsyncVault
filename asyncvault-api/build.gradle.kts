@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("maven-publish")
+    id("jacoco")
 }
 
 description = "AsyncVault Core API - Async-first service abstractions"
@@ -30,6 +31,13 @@ tasks.jar {
             "Implementation-Version" to project.version,
             "Implementation-Vendor" to "AsyncVault"
         )
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+        csv.required.set(true)
     }
 }
 
