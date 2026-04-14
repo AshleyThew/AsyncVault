@@ -1,7 +1,9 @@
 # AsyncVault
 
 [![Latest Release](https://img.shields.io/github/v/release/AshleyThew/AsyncVault?display_name=tag)](https://github.com/AshleyThew/AsyncVault/releases/latest)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/AshleyThew/AsyncVault/build.yml?branch=main&label=build)](https://github.com/AshleyThew/AsyncVault/actions/workflows/build.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/AshleyThew/AsyncVault/build.yml?branch=main&label=build)](https://github.com/AshleyThew/AsyncVault/actions/workflows/build.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/AshleyThew/AsyncVault/ci.yml?branch=main&label=tests)](https://github.com/AshleyThew/AsyncVault/actions/workflows/ci.yml)
+[![Coverage](https://codecov.io/gh/AshleyThew/AsyncVault/branch/main/graph/badge.svg)](https://codecov.io/gh/AshleyThew/AsyncVault)
 
 AsyncVault is a lightweight bridge API for Economy, Permission, and Chat services.
 
@@ -59,11 +61,15 @@ How to consume Economy, Permission, and Chat providers from your plugin:
 
 - [API_DEVELOPERS.md](API_DEVELOPERS.md)
 
-## Build
+## Build And Test
 
 ```bash
 ./gradlew build
 ./gradlew bundleJars
+./gradlew :asyncvault-api:test :asyncvault-api:jacocoTestReport
 ```
 
 Bundles are generated in `build/libs/`.
+
+- Test report: `asyncvault-api/build/reports/tests/test/index.html`
+- Coverage report: `asyncvault-api/build/reports/jacoco/test/html/index.html`

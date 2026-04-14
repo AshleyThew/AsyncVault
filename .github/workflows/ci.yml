@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: ['main', 'develop']
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Make gradlew executable
+        run: chmod +x gradlew
+
+      - name: Build and test
+        run: ./gradlew :asyncvault-api:test :asyncvault-api:jacocoTestReport --no-daemon
+
+      - name: Upload test reports artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            asyncvault-api/build/reports/tests/test
+            asyncvault-api/build/test-results/test
+
+      - name: Upload coverage reports artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: |
+            asyncvault-api/build/reports/jacoco/test
+            asyncvault-api/build/reports/jacoco/test/jacocoTestReport.xml
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./asyncvault-api/build/reports/jacoco/test/jacocoTestReport.xml
+          fail_ci_if_error: false
